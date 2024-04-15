@@ -23,16 +23,17 @@ prompt = ["portrait, natural light, ultra detailed"]
 negative_prompt = ['unknown author, random sketch']
 
 generator = torch.Generator("cuda")
-seed = generator.seed()
-print(f"{seed=}")
+# seed = generator.seed()
+# print(f"{seed=}")
+seed = 42
 generator = generator.manual_seed(seed)
 
 for i in range(100):
     state = generator.get_state()
     for j, (label, num_inference_steps, kwargs) in enumerate([
-        ("cfg9", 15, {'guidance_scale': 10.0, 'boost_scale': 0}),
-        ("cfg3", 15, {'guidance_scale': 3.0, 'boost_scale': 0}),
-        ("cfg3boost", 15, {'guidance_scale': 3.0, 'boost_scale': 0.125}),
+        ("cfg10", 30, {'guidance_scale': 10.0, 'boost_scale': 0}),
+        ("cfg3", 30, {'guidance_scale': 2.5, 'boost_scale': 0}),
+        ("cfg3boost", 30, {'guidance_scale': 2.5, 'boost_scale': 0.125}),
     ]):
         generator.set_state(state)
 
