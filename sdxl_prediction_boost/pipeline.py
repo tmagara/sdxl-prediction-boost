@@ -842,6 +842,7 @@ class StableDiffusionXLPipeline(
         clip_skip: Optional[int] = None,
         callback_on_step_end: Optional[Callable[[int, int, Dict], None]] = None,
         callback_on_step_end_tensor_inputs: List[str] = ["latents"],
+        boost_scale=0.0,
         **kwargs,
     ):
         r"""
@@ -1191,6 +1192,20 @@ class StableDiffusionXLPipeline(
                 if self.do_classifier_free_guidance and self.guidance_rescale > 0.0:
                     # Based on 3.4. in https://arxiv.org/pdf/2305.08891.pdf
                     noise_pred = rescale_noise_cfg(noise_pred, noise_pred_text, guidance_rescale=self.guidance_rescale)
+
+                # prediction boost
+                if self.do_classifier_free_guidance:
+                    _, xt = latent_model_input.chunk(2)
+                else:
+                    xt = latent_model_input
+                    noise_pred_text = noise_pred
+
+                def _projection(u, v):
+                    uv = torch.mean(u * v, dim=[1, 2, 3], keepdim=True)
+                    vv = torch.mean(v ** 2, dim=[1, 2, 3], keepdim=True) + 1.0e-05
+                    return (uv / vv) * v
+
+                noise_pred = noise_pred - boost_scale * (xt - _projection(xt, noise_pred_text))
 
                 # compute the previous noisy sample x_t -> x_t-1
                 latents = self.scheduler.step(noise_pred, t, latents, **extra_step_kwargs, return_dict=False)[0]

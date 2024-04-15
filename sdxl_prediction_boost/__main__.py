@@ -30,9 +30,9 @@ generator = generator.manual_seed(seed)
 for i in range(100):
     state = generator.get_state()
     for j, (label, num_inference_steps, kwargs) in enumerate([
-        ("cfg9", 15, {'guidance_scale': 9.0, 'boost_scale': 0}),
-        # ("cfg3", 15, {'guidance_scale': 3.0, 'boost_scale': 0}),
-        # ("cfg3boost", 15, {'guidance_scale': 3.0, 'boost_scale': 0.125}),
+        ("cfg9", 15, {'guidance_scale': 10.0, 'boost_scale': 0}),
+        ("cfg3", 15, {'guidance_scale': 3.0, 'boost_scale': 0}),
+        ("cfg3boost", 15, {'guidance_scale': 3.0, 'boost_scale': 0.125}),
     ]):
         generator.set_state(state)
 
